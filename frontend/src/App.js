@@ -1,25 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import { Suspense } from "react";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, Stars } from "@react-three/drei";
+import Boat from "./components/Boat";
+import River from "./components/River";
+import ArtworkOrb from "./components/ArtworkOrb";
+import RiverBanks from "./components/RiverBanks";
+import Controls from "./components/Controls";
+import "./App.css";
 
-function App() {
+
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ width: "100vw", height: "100vh", background: "black" }}>
+      <Canvas camera={{ position: [0, 2, 10], fov: 60 }}>
+        <Suspense fallback={null}>
+          <ambientLight intensity={0.4} />
+          <directionalLight position={[5, 10, 5]} intensity={1.2} />
+          <Stars radius={100} depth={50} count={3000} factor={4} fade />
+          <River />
+          <RiverBanks />
+          <ArtworkOrb />
+          <Boat />
+        </Suspense>
+        <OrbitControls enableZoom={false} enablePan={false} />
+      </Canvas>
+      <Controls />
     </div>
   );
 }
-
-export default App;
