@@ -18,8 +18,7 @@ export default function App() {
           <directionalLight position={[5, 10, 5]} intensity={1.2} />
           <Stars radius={100} depth={50} count={3000} factor={4} fade />
           <River />
-          <RiverBanks />
-         
+          <Boat />
         </Suspense>
         <OrbitControls enableZoom={false} enablePan={false} />
       </Canvas>
