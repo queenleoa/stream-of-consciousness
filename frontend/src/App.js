@@ -19,6 +19,7 @@ export default function App() {
           <Stars radius={100} depth={50} count={3000} factor={4} fade />
           <River />
           <Boat />
+          <ArtworkOrb />
         </Suspense>
         <OrbitControls enableZoom={false} enablePan={false} />
       </Canvas>
