@@ -14,30 +14,30 @@ export default function Boat() {
     shape.moveTo(0, -1.5);
     
     // Left side rising up and back
-    shape.lineTo(-1.2, -0.5);
+    shape.lineTo(-1.2, -0.2);
     shape.lineTo(-1.0, 0.2);
     
     // Back left
-    shape.lineTo(-0.8, 0.5);
+    shape.lineTo(-0.1, 1.0);
     
     // Back edge
-    shape.lineTo(0.8, 0.5);
+    shape.lineTo(0.1, 1.0);
     
     // Back right
     shape.lineTo(1.0, 0.2);
     
     // Right side
-    shape.lineTo(1.2, -0.5);
+    shape.lineTo(1.2, -0.2);
     
     // Back to bottom point
     shape.lineTo(0, -1.5);
     
     const extrudeSettings = {
-      depth: 3,
+      depth: 0.5,
       bevelEnabled: true,
-      bevelThickness: 0.1,
+      bevelThickness: 0.05,
       bevelSize: 0.05,
-      bevelSegments: 3
+      bevelSegments: 10
     };
     
     return new THREE.ExtrudeGeometry(shape, extrudeSettings);
@@ -50,9 +50,9 @@ export default function Boat() {
         time: { value: 0 },
         // Iridescent color palette
         baseColor: { value: new THREE.Color(0x2a1810) },      // Dark brown base
-        iridescent1: { value: new THREE.Color(0xd4a574) },    // Gold
-        iridescent2: { value: new THREE.Color(0xf4c795) },    // Light gold/cream
-        iridescent3: { value: new THREE.Color(0xa67c52) },    // Bronze
+        iridescent1: { value: new THREE.Color(0xa9845c) },    // Gold
+        iridescent2: { value: new THREE.Color(0xc39f77) },    // Light gold/cream
+        iridescent3: { value: new THREE.Color(0x956f49) },    // Bronze
       },
       vertexShader: `
         varying vec3 vNormal;
@@ -147,9 +147,9 @@ export default function Boat() {
       ref={boatRef}
       geometry={boatGeometry}
       material={boatMaterial}
-      position={[0, 0.1, 8]}
+      position={[0, 0, 8.15]}
       rotation={[0, Math.PI, 0]}
-      scale={[0.5, 0.5, 0.5]}
+      scale={[0.75, 0.75, 0.75]}
     />
   );
 }
