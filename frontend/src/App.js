@@ -20,6 +20,7 @@ export default function App() {
           <River />
           <Boat />
           <ArtworkOrb />
+          <RiverBanks />
         </Suspense>
         <OrbitControls enableZoom={false} enablePan={false} />
       </Canvas>

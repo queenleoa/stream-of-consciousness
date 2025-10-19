@@ -1,27 +1,30 @@
 # yaml-language-server: $schema=./node_modules/envio/evm.schema.json
-name: Greeter
-description: Greeter indexer
+name: stream-of-consciousness
+description: stream-of-consciousness indexer
 #Global contract definitions that must contain all definitions except
 #addresses. Now you can share a single handler/abi/event definitions
-#for contracts across multiple chains
-contracts:
-  - name: Greeter
-    abi_file_path: ./abis/greeter-abi.json
-    handler: ./src/EventHandlers.ts
-    events:
-      - event: NewGreeting
-      - event: ClearGreeting
 networks:
-  - id: 137 # Polygon
-    start_block: 45336336
+  - id: 1 # Ethereum
+    start_block: 0
     contracts:
-      - name: Greeter #A reference to the global contract definition
-        address: 0x9D02A17dE4E68545d3a58D3a20BbBE0399E05c9c
-  - id: 59144 # Linea
-    start_block: 367801
+      - name: ERC721 #A reference to the wildcard contract definition
+        handler: ./src/EventHandlers.ts
+        events: 
+        - event: Transfer(address indexed from, address indexed to, uint256 value)
+  - id: 8453 # Base
+    start_block: 0
     contracts:
-      - name: Greeter #A reference to the global contract definition
-        address: 0xdEe21B97AB77a16B4b236F952e586cf8408CF32A
+      - name: ERC721 #A reference to the wildcard contract definition
+        handler: ./src/EventHandlers.ts
+        events:
+        - event: Transfer(address indexed from, address indexed to, uint256 value) 
+  - id: 7777777 # Zora
+    start_block: 0
+    contracts:
+      - name: ERC721 #A reference to the wildcard contract definition
+        handler: ./src/EventHandlers.ts
+        events: 
+        - event: Transfer(address indexed from, address indexed to, uint256 value)
 # Unordered multichain mode allows you to index events from multiple chains
 # in realtime but doesn't guarentee ordering between chains
 # https://docs.envio.dev/docs/HyperIndex/multichain-indexing#unordered-multichain-mode
