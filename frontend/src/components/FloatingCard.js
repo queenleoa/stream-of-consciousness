@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
@@ -7,96 +7,77 @@ export default function FloatingCard({
   position, 
   color, 
   content, 
-  floatOffset = 0,
+  floatOffset = 0, 
   onCardClick 
 }) {
   const cardRef = useRef();
-  const [isHovered, setIsHovered] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
-  // Glowing card material
-  const cardMaterial = useMemo(() => {
-    return new THREE.ShaderMaterial({
-      uniforms: {
-        time: { value: 0 },
-        cardColor: { value: new THREE.Color(color) },
-        glowIntensity: { value: isHovered ? 1.5 : 1.0 },
-      },
-      vertexShader: `
-        varying vec2 vUv;
-        varying vec3 vPosition;
-        
-        void main() {
-          vUv = uv;
-          vPosition = position;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragmentShader: `
-        uniform float time;
-        uniform vec3 cardColor;
-        uniform float glowIntensity;
-        varying vec2 vUv;
-        varying vec3 vPosition;
-        
-        void main() {
-          // Rounded corners
-          vec2 center = vUv - 0.5;
-          float cornerRadius = 0.1;
-          vec2 edgeDist = abs(center) - (0.5 - cornerRadius);
-          float cornerDist = length(max(edgeDist, 0.0));
-          float rounded = smoothstep(cornerRadius + 0.01, cornerRadius - 0.01, cornerDist);
-          
-          // Inner card color with subtle gradient
-          float gradient = vUv.y * 0.3 + 0.7;
-          vec3 innerColor = cardColor * gradient;
-          
-          // Outer glow
-          float glowDist = length(center);
-          float glow = exp(-glowDist * 3.0) * 0.6 * glowIntensity;
-          
-          // Pulsing effect
-          float pulse = sin(time * 1.5) * 0.1 + 0.9;
-          
-          // Edge highlight
-          float edge = smoothstep(0.38, 0.42, length(center));
-          vec3 edgeGlow = cardColor * edge * 0.8 * pulse;
-          
-          // Combine
-          vec3 finalColor = innerColor + edgeGlow + (cardColor * glow * pulse);
-          float alpha = rounded * (0.85 + glow * 0.15);
-          
-          gl_FragColor = vec4(finalColor, alpha);
-        }
-      `,
-      transparent: true,
-      side: THREE.DoubleSide,
-      blending: THREE.AdditiveBlending,
-    });
-  }, [color, isHovered]);
-
-  // Animate floating and update shader
+  // Floating animation
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
     
     if (cardRef.current) {
-      // Gentle floating motion
-      cardRef.current.position.y = position[1] + Math.sin(time * 0.8 + floatOffset) * 0.15;
+      // Gentle float up and down
+      cardRef.current.position.y = position[1] + Math.sin(time * 0.8 + floatOffset) * 0.3;
       
-      // Subtle rotation
-      cardRef.current.rotation.z = Math.sin(time * 0.5 + floatOffset) * 0.05;
-      cardRef.current.rotation.x = Math.cos(time * 0.6 + floatOffset) * 0.03;
-    }
-    
-    if (cardMaterial) {
-      cardMaterial.uniforms.time.value = time;
-      cardMaterial.uniforms.glowIntensity.value = isHovered ? 1.5 : 1.0;
+      // Subtle rotation sway
+      cardRef.current.rotation.y = Math.sin(time * 0.5 + floatOffset) * 0.08;
+      cardRef.current.rotation.x = Math.cos(time * 0.6 + floatOffset) * 0.05;
+      
+      // Scale up slightly when hovered
+      const targetScale = hovered ? 1.08 : 1.0;
+      cardRef.current.scale.lerp(
+        new THREE.Vector3(targetScale, targetScale, targetScale), 
+        0.1
+      );
     }
   });
 
   return (
     <group ref={cardRef} position={position}>
-      {/* Card glow background */}
-      
+      {/* Clickable invisible mesh (larger hit area) */}
+      <mesh
+        onClick={(e) => {
+          e.stopPropagation();
+          onCardClick();
+        }}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          setHovered(true);
+          document.body.style.cursor = 'pointer';
+        }}
+        onPointerOut={(e) => {
+          e.stopPropagation();
+          setHovered(false);
+          document.body.style.cursor = 'auto';
+        }}
+      >
+        <planeGeometry args={[4.5, 2.3]} />
+        <meshBasicMaterial transparent opacity={0} />
+      </mesh>
+
+      {/* Glowing card background */}
+      <mesh position={[0, 0, -0.01]}>
+        <planeGeometry args={[4.2, 2.1]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={hovered ? 0.25 : 0.15}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+
+      {/* Outer glow effect */}
+      <mesh position={[0, 0, -0.02]}>
+        <planeGeometry args={[4.8, 2.5]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={hovered ? 0.12 : 0.06}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
 
       {/* Card content - HTML overlay */}
       <Html
@@ -104,7 +85,7 @@ export default function FloatingCard({
         center
         distanceFactor={8}
         style={{
-          pointerEvents: 'none',
+          pointerEvents: 'none', // Let the mesh handle clicks
           userSelect: 'none',
         }}
       >
@@ -112,46 +93,53 @@ export default function FloatingCard({
           style={{
             width: '400px',
             height: '200px',
-            padding: '16px',
-            borderRadius: '12px',
-            background: 'rgba(0, 0, 0, 0.4)',
-            backdropFilter: 'blur(10px)',
-            border: `2px solid ${color}40`,
-            boxShadow: `0 0 20px ${color}60`,
+            padding: '20px',
+            borderRadius: '16px',
+            background: `linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4))`,
+            backdropFilter: 'blur(12px)',
+            border: `2px solid ${color}${hovered ? '80' : '40'}`,
+            boxShadow: `0 0 ${hovered ? '30px' : '20px'} ${color}${hovered ? '80' : '60'}`,
             color: 'white',
-            fontSize: '11px',
             fontFamily: 'system-ui, -apple-system, sans-serif',
             display: 'flex',
             flexDirection: 'column',
-            gap: '8px',
+            gap: '12px',
             overflow: 'hidden',
+            transition: 'all 0.3s ease',
+            transform: hovered ? 'scale(1.02)' : 'scale(1)',
           }}
         >
           <div style={{ 
-            fontSize: '20px', 
+            fontSize: '22px', 
             fontWeight: '600', 
             color: color,
-            marginBottom: '4px',
-            textShadow: `0 0 10px ${color}`,
+            marginBottom: '6px',
+            textShadow: `0 0 15px ${color}`,
+            letterSpacing: '0.3px',
           }}>
             {content.title}
           </div>
           <div style={{ 
-            fontSize: '18px', 
+            fontSize: '16px', 
             opacity: 0.9,
-            lineHeight: '1.4',
+            lineHeight: '1.5',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: 'vertical',
           }}>
             {content.preview}
           </div>
           <div style={{ 
             marginTop: 'auto',
-            fontSize: '12px',
-            opacity: 0.6,
+            fontSize: '13px',
+            opacity: hovered ? 0.9 : 0.6,
             fontStyle: 'italic',
+            color: color,
+            transition: 'opacity 0.3s ease',
           }}>
-            Click to expand
+            {hovered ? '→ Click to expand' : 'Click to expand'}
           </div>
         </div>
       </Html>

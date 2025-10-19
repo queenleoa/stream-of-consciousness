@@ -9,8 +9,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 9999; /* Much higher to ensure it's above everything */
   animation: fadeIn 0.3s ease;
+  pointer-events: auto; /* Ensure it captures all clicks */
 }
 
 @keyframes fadeIn {

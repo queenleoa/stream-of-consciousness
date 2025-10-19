@@ -1,19 +1,7 @@
-import { useState } from "react";
 import FloatingCard from "./FloatingCard";
-import ExpandedCard from "./ExpandedCard";
 import { leftBankCards, rightBankCards } from "../data/cardData";
 
-export default function FloatingCards() {
-  const [expandedCard, setExpandedCard] = useState(null);
-
-  const handleCardClick = (card) => {
-    setExpandedCard(card);
-  };
-
-  const handleClose = () => {
-    setExpandedCard(null);
-  };
-
+export default function FloatingCards({ onCardClick }) {
   return (
     <>
       {/* Left Bank Cards (On-chain data) */}
@@ -27,7 +15,7 @@ export default function FloatingCards() {
             preview: card.preview,
           }}
           floatOffset={index * 0.5}
-          onCardClick={() => handleCardClick(card)}
+          onCardClick={() => onCardClick(card)}
         />
       ))}
 
@@ -42,14 +30,9 @@ export default function FloatingCards() {
             preview: card.preview,
           }}
           floatOffset={index * 0.7}
-          onCardClick={() => handleCardClick(card)}
+          onCardClick={() => onCardClick(card)}
         />
       ))}
-
-      {/* Expanded Card Modal */}
-      {expandedCard && (
-        <ExpandedCard card={expandedCard} onClose={handleClose} />
-      )}
     </>
   );
 }
