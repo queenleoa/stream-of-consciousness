@@ -6,6 +6,7 @@ import River from "./components/River";
 import ArtworkOrb from "./components/ArtworkOrb";
 import RiverBanks from "./components/RiverBanks";
 import Controls from "./components/Controls";
+import AudioPlayer from "./components/AudioPlayer";
 import "./App.css";
 
 
@@ -16,7 +17,7 @@ export default function App() {
         <Suspense fallback={null}>
           <ambientLight intensity={0.8} />
           <directionalLight position={[5, 10, 5]} intensity={1.2} />
-          <Stars radius={100} depth={50} count={3000} factor={4} fade />
+          <Stars radius={100} depth={100} count={20000} factor={5} fade />
           <River />
           <Boat />
           <ArtworkOrb />
@@ -25,6 +26,7 @@ export default function App() {
         <OrbitControls enableZoom={false} enablePan={false} />
       </Canvas>
       <Controls />
+      <AudioPlayer />
     </div>
   );
 }

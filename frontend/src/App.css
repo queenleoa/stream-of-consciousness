@@ -26,3 +26,69 @@ body, html, #root {
   font-size: 0.9rem;
   opacity: 0.8;
 }
+
+/* Audio Control Button Styles */
+.audio-control {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(20, 25, 35, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 100;
+  padding: 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.audio-control:hover {
+  background: rgba(30, 35, 45, 0.9);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 1);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+}
+
+.audio-control:active {
+  transform: scale(0.95);
+}
+
+.audio-control:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.audio-control svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Audio loading indicator */
+.audio-loading {
+  position: fixed;
+  bottom: 90px;
+  right: 30px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+  background: rgba(20, 25, 35, 0.8);
+  padding: 6px 12px;
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}

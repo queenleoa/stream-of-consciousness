@@ -85,9 +85,9 @@ export default function ArtworkOrb({ imageUrl = '/test.png' }) {
   });
   
   return (
-    <group ref={groupRef} position={[0, 0, -80]}>
+    <group ref={groupRef} position={[0, 0, -90]}>
       {/* Outer ambient glow */}
-      <mesh position={[0, 3, -0.3]}>
+      <mesh position={[0, 5, -0.3]}>
         <planeGeometry args={[scale3D.width * 10, scale3D.height * 10]} />
         <primitive object={glowMaterial} />
       </mesh>

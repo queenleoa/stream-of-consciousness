@@ -7,7 +7,7 @@ export default function River() {
   
   // Create a plane with segments for wave animation
   const geometry = useMemo(() => {
-    return new THREE.PlaneGeometry(200, 50, 256, 256);
+    return new THREE.PlaneGeometry(200, 150, 256, 256);
   }, []);
 
   // Custom shader material for realistic water
