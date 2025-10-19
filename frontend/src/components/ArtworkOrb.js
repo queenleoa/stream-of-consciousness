@@ -85,7 +85,7 @@ export default function ArtworkOrb({ imageUrl = '/test.png' }) { //replace with 
   });
   
   return (
-    <group ref={groupRef} position={[0, 0, -90]}>
+    <group ref={groupRef} position={[0, 0, -50]}>
       {/* Outer ambient glow */}
       <mesh position={[0, 5, -0.3]}>
         <planeGeometry args={[scale3D.width * 10, scale3D.height * 10]} />

@@ -117,22 +117,23 @@ export default function Boat() {
     });
   }, []);
   
-  // Gentle bobbing animation
+  // Animation: bobbing + following camera
   useFrame((state) => {
     if (boatRef.current) {
       const time = state.clock.getElapsedTime();
       
-      // Very gentle vertical bob (amplitude: 0.03 = very subtle)
-      // Speed: 0.8 = slow gentle movement
-      // Base position: 0.3 = slightly above water
+      // Get camera Z position (set by CameraController)
+      const cameraZ = window.cameraJourneyPosition?.z || 10;
+      
+      // Boat stays slightly behind camera (offset by -1.85 units)
+      const boatZ = cameraZ - 1.85;
+      boatRef.current.position.z = boatZ;
+      
+      // Gentle vertical bob (amplitude: 0.03 = very subtle)
       boatRef.current.position.y = 0.3 + Math.sin(time * 0.8) * 0.03;
       
-      // Very subtle roll/tilt (amplitude: 0.008 radians = ~0.5 degrees)
-      // Speed: 1.0 = slightly varied from vertical bob
+      // Very subtle roll/tilt
       boatRef.current.rotation.z = Math.sin(time * 1.0) * 0.008;
-      
-      // Tiny forward-back tilt (amplitude: 0.005 radians = ~0.3 degrees)
-      // Speed: 0.6 = slowest movement
       boatRef.current.rotation.x = Math.cos(time * 0.6) * 0.005;
       
       // Update material time for iridescent animation
