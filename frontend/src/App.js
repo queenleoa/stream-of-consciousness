@@ -7,6 +7,7 @@ import ArtworkOrb from "./components/ArtworkOrb";
 import RiverBanks from "./components/RiverBanks";
 import Controls from "./components/Controls";
 import AudioPlayer from "./components/AudioPlayer";
+import FloatingCards from "./components/FloatingCards";
 import "./App.css";
 
 
@@ -18,6 +19,7 @@ export default function App() {
           <ambientLight intensity={0.8} />
           <directionalLight position={[5, 10, 5]} intensity={1.2} />
           <Stars radius={100} depth={100} count={20000} factor={5} fade />
+          <FloatingCards />
           <River />
           <Boat />
           <ArtworkOrb />

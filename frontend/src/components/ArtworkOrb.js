@@ -3,7 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
 
-export default function ArtworkOrb({ imageUrl = '/test.png' }) {
+export default function ArtworkOrb({ imageUrl = '/test.png' }) { //replace with url
   const groupRef = useRef();
   const [imageDimensions, setImageDimensions] = useState({ width: 512, height: 512 });
   
