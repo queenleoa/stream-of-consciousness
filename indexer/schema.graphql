@@ -13,16 +13,7 @@ type Transfer {
   logIndex: Int!
   txHash: String!
   contract: String!
-
   tokenId: BigInt!
   from: String!
   to: String!
-}
-
-# optional (nice to have)
-type TokenMetadata {
-  id: ID!                 # "<contract>_<tokenId>"
-  contract: String!
-  tokenId: BigInt!
-  tokenURI: String
 }
