@@ -1,40 +1,21 @@
-import { Greeter, User } from "generated";
+import { ERC721 } from "generated";
 
-// Handler for the NewGreeting event
-Greeter.NewGreeting.handler(async ({ event, context }) => {
-  const userId = event.params.user;
-  const latestGreeting = event.params.greeting;
-  const currentUserEntity: User | undefined = await context.User.get(userId);
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
-  // Update or create a new User entity
-  const userEntity: User = currentUserEntity
-    ? {
-      id: userId,
-      latestGreeting,
-      numberOfGreetings: currentUserEntity.numberOfGreetings + 1,
-      greetings: [...currentUserEntity.greetings, latestGreeting],
-    }
-    : {
-      id: userId,
-      latestGreeting,
-      numberOfGreetings: 1,
-      greetings: [latestGreeting],
-    };
+ERC721.Transfer.handler(
+  async ( { event, context } ) => {
+    context.Transfer.set({
+      id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
+      chainId: event.chainId,
+      blockNumber: BigInt(event.block.number),
+      logIndex: event.logIndex,
+      txId: event.transaction.hash,   
+      contract: event.srcAddress,   // <- use srcAddress, not address
 
-  context.User.set(userEntity);
-});
-
-// Handler for the ClearGreeting event
-Greeter.ClearGreeting.handler(async ({ event, context }) => {
-  const userId = event.params.user;
-  const currentUserEntity: User | undefined = await context.User.get(userId);
-
-  if (currentUserEntity) {
-    // Clear the latestGreeting
-    context.User.set({
-      ...currentUserEntity,
-      latestGreeting: "",
+      tokenId: event.params.tokenId,
+      from: event.params.from,
+      to: event.params.to,
     });
-  }
-});
-
+  },
+  { wildcard: true, eventFilters: { from: ZERO_ADDRESS } }
+);

@@ -9,6 +9,39 @@ body, html, #root {
   color: white;
 }
 
+/* Page transition animations */
+.page-wrapper {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+.fade-in {
+  animation: fadeIn 0.8s ease-in forwards;
+}
+
+.fade-out {
+  animation: fadeOut 0.8s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 .controls {
   position: absolute;
   top: 20px;

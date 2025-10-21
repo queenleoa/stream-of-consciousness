@@ -1,6 +1,28 @@
-type User {
-  id: ID!
-  greetings: [String!]!
-  latestGreeting: String!
-  numberOfGreetings: Int!
+type Contract {
+  id: ID!                 # "<chainId>_<address>"
+  chainId: Int!
+  address: String!
+  isErc721: Boolean!
+  checkedAtBlock: BigInt
+}
+
+type Transfer {
+  id: ID!                 # "<chainId>_<blockNumber>_<logIndex>"
+  chainId: Int!
+  blockNumber: BigInt!
+  logIndex: Int!
+  txHash: String!
+  contract: String!
+
+  tokenId: BigInt!
+  from: String!
+  to: String!
+}
+
+# optional (nice to have)
+type TokenMetadata {
+  id: ID!                 # "<contract>_<tokenId>"
+  contract: String!
+  tokenId: BigInt!
+  tokenURI: String
 }

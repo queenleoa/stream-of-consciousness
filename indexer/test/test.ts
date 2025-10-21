@@ -1,120 +1,62 @@
 import assert from "assert";
-import { TestHelpers, User } from "generated";
-const { MockDb, Greeter, Addresses } = TestHelpers;
+import { TestHelpers, Account } from "generated";
+const { MockDb, ERC20, Addresses } = TestHelpers;
 
-describe("Greeter template tests", () => {
-  it("A NewGreeting event creates a User entity", async () => {
-    // Initializing the mock database
-    const mockDbInitial = MockDb.createMockDb();
+describe("Transfers", () => {
+  it("Transfer subtracts the from account balance and adds to the to account balance", async () => {
+    //Instantiate a mock DB
+    const mockDbEmpty = MockDb.createMockDb();
 
-    // Initializing values for mock event
-    const userAddress = Addresses.defaultAddress;
-    const greeting = "Hi there";
+    //Get mock addresses from helpers
+    const userAddress1 = Addresses.mockAddresses[0];
+    const userAddress2 = Addresses.mockAddresses[1];
 
-    // Creating a mock event
-    const mockNewGreetingEvent = Greeter.NewGreeting.createMockEvent({
-      greeting: greeting,
-      user: userAddress,
-    });
-
-    // Processing the mock event on the mock database
-    const updatedMockDb = await Greeter.NewGreeting.processEvent({
-      event: mockNewGreetingEvent,
-      mockDb: mockDbInitial,
-    });
-
-    // Expected entity that should be created
-    const expectedUserEntity: User = {
-      id: userAddress,
-      latestGreeting: greeting,
-      numberOfGreetings: 1,
-      greetings: [greeting],
+    //Make a mock entity to set the initial state of the mock db
+    const mockAccountEntity: Account = {
+      id: userAddress1,
+      balance: 5n,
     };
 
-    // Getting the entity from the mock database
-    const actualUserEntity = updatedMockDb.entities.User.get(userAddress);
+    //Set an initial state for the user
+    //Note: set and delete functions do not mutate the mockDb, they return a new
+    //mockDb with with modified state
+    const mockDb = mockDbEmpty.entities.Account.set(mockAccountEntity);
 
-    // Asserting that the entity in the mock database is the same as the expected entity
-    assert.deepEqual(expectedUserEntity, actualUserEntity);
-  });
-
-  it("2 Greetings from the same users results in that user having a greeter count of 2", async () => {
-    // Initializing the mock database
-    const mockDbInitial = MockDb.createMockDb();
-    // Initializing values for mock event
-    const userAddress = Addresses.defaultAddress;
-    const greeting = "Hi there";
-    const greetingAgain = "Oh hello again";
-
-    // Creating a mock event
-    const mockNewGreetingEvent = Greeter.NewGreeting.createMockEvent({
-      greeting: greeting,
-      user: userAddress,
+    //Create a mock Transfer event from userAddress1 to userAddress2
+    const mockTransfer = ERC20.Transfer.createMockEvent({
+      from: userAddress1,
+      to: userAddress2,
+      value: 3n,
     });
 
-    // Creating a mock event
-    const mockNewGreetingEvent2 = Greeter.NewGreeting.createMockEvent({
-      greeting: greetingAgain,
-      user: userAddress,
+    //Process the mockEvent
+    //Note: processEvent functions do not mutate the mockDb, they return a new
+    //mockDb with with modified state
+    const mockDbAfterTransfer = await ERC20.Transfer.processEvent({
+      event: mockTransfer,
+      mockDb,
     });
 
-    // Processing the mock event on the mock database
-    const updatedMockDb = await Greeter.NewGreeting.processEvent({
-      event: mockNewGreetingEvent,
-      mockDb: mockDbInitial,
-    });
+    //Get the balance of userAddress1 after the transfer
+    const account1Balance =
+      mockDbAfterTransfer.entities.Account.get(userAddress1)?.balance;
 
-    // Processing the mock event on the updated mock database
-    const updatedMockDb2 = await Greeter.NewGreeting.processEvent({
-      event: mockNewGreetingEvent2,
-      mockDb: updatedMockDb,
-    });
+    //Assert the expected balance
+    assert.equal(
+      2n,
+      account1Balance,
+      "Should have subtracted transfer amount 3 from userAddress1 balance 5",
+    );
 
-    // Getting the entity from the mock database
-    const actualUserEntity = updatedMockDb2.entities.User.get(userAddress);
+    //Get the balance of userAddress2 after the transfer
+    const account2Balance =
+      mockDbAfterTransfer.entities.Account.get(userAddress2)?.balance;
 
-    // Asserting that the field value of the entity in the mock database is the same as the expected field value
-    assert.equal(2, actualUserEntity?.numberOfGreetings);
-  });
-
-  it("2 Greetings from the same users results in the latest greeting being the greeting from the second event", async () => {
-    // Initializing the mock database
-    const mockDbInitial = MockDb.createMockDb();
-    // Initializing values for mock event
-    const userAddress = Addresses.defaultAddress;
-    const greeting = "Hi there";
-    const greetingAgain = "Oh hello again";
-
-    // Creating a mock event
-    const mockNewGreetingEvent = Greeter.NewGreeting.createMockEvent({
-      greeting: greeting,
-      user: userAddress,
-    });
-
-    // Creating a mock event
-    const mockNewGreetingEvent2 = Greeter.NewGreeting.createMockEvent({
-      greeting: greetingAgain,
-      user: userAddress,
-    });
-
-    // Processing the mock event on the mock database
-    const updatedMockDb = await Greeter.NewGreeting.processEvent({
-      event: mockNewGreetingEvent,
-      mockDb: mockDbInitial,
-    });
-
-    // Processing the mock event on the updated mock database
-    const updatedMockDb2 = await Greeter.NewGreeting.processEvent({
-      event: mockNewGreetingEvent2,
-      mockDb: updatedMockDb,
-    });
-
-    // Getting the entity from the mock database
-    const actualUserEntity = updatedMockDb2.entities.User.get(userAddress);
-
-    const expectedGreeting: string = greetingAgain;
-
-    // Asserting that the field value of the entity in the mock database is the same as the expected field value
-    assert.equal(expectedGreeting, actualUserEntity?.latestGreeting);
+    //Assert the expected balance
+    assert.equal(
+      3n,
+      account2Balance,
+      "Should have added transfer amount 3 to userAddress2 balance 0",
+    );
   });
 });

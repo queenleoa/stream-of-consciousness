@@ -10,9 +10,12 @@ import AudioPlayer from "./components/AudioPlayer";
 import FloatingCards from "./components/FloatingCards";
 import ExpandedCard from "./components/ExpandedCard";
 import CameraController from "./components/CameraController";
+import HomePage from "./components/HomePage";
 import "./App.css";
 
 export default function App() {
+  const [currentPage, setCurrentPage] = useState('home'); // 'home' or 'stream'
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [expandedCard, setExpandedCard] = useState(null);
 
   const handleCardClick = (card) => {
@@ -23,8 +26,70 @@ export default function App() {
     setExpandedCard(null);
   };
 
+  const navigateToStream = () => {
+    setIsTransitioning(true);
+    // Wait for fade out animation (800ms) before switching page
+    setTimeout(() => {
+      setCurrentPage('stream');
+      setIsTransitioning(false);
+    }, 900);
+  };
+
+  const navigateToHome = () => {
+    setIsTransitioning(true);
+    // Wait for fade out animation before switching page
+    setTimeout(() => {
+      setCurrentPage('home');
+      setExpandedCard(null);
+      setIsTransitioning(false);
+    }, 800);
+  };
+
+  // Show HomePage
+  if (currentPage === 'home') {
+    return (
+      <div className={`page-wrapper ${isTransitioning ? 'fade-out' : 'fade-in'}`}>
+        <HomePage onNavigateToStream={navigateToStream} />
+      </div>
+    );
+  }
+
+  // Show Stream of Consciousness page
   return (
-    <div style={{ width: "100vw", height: "100vh", background: "dark-blue", position: "relative" }}>
+    <div className={`page-wrapper stream-page ${isTransitioning ? 'fade-out' : 'fade-in'}`} style={{ width: "100vw", height: "100vh", position: "relative" }}>
+      {/* Back to Home Button */}
+      <button 
+        onClick={navigateToHome}
+        disabled={isTransitioning}
+        style={{
+          position: 'absolute',
+          top: '20px',
+          right: '20px',
+          padding: '12px 24px',
+          background: 'rgba(255, 255, 255, 0.1)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          borderRadius: '8px',
+          color: 'white',
+          cursor: isTransitioning ? 'not-allowed' : 'pointer',
+          fontSize: '14px',
+          fontWeight: '600',
+          zIndex: 100,
+          backdropFilter: 'blur(10px)',
+          transition: 'all 0.3s ease',
+          opacity: isTransitioning ? 0.5 : 1,
+        }}
+        onMouseEnter={(e) => {
+          if (!isTransitioning) {
+            e.target.style.background = 'rgba(255, 255, 255, 0.2)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.background = 'rgba(255, 255, 255, 0.1)';
+        }}
+      >
+        ← Back to Home
+      </button>
+
       {/* 3D Canvas - lower z-index */}
       <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
         <Canvas camera={{ position: [0, 2, 10], fov: 60 }}>

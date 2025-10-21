@@ -1,30 +1,17 @@
 # yaml-language-server: $schema=./node_modules/envio/evm.schema.json
-name: stream-of-consciousness
-description: stream-of-consciousness indexer
-#Global contract definitions that must contain all definitions except
-#addresses. Now you can share a single handler/abi/event definitions
+name: erc721indexer
+description: ERC-721 indexer
 networks:
-  - id: 1 # Ethereum
+  - id: 1
     start_block: 0
     contracts:
-      - name: ERC721 #A reference to the wildcard contract definition
-        handler: ./src/EventHandlers.ts
-        events: 
-        - event: Transfer(address indexed from, address indexed to, uint256 value)
-  - id: 8453 # Base
-    start_block: 0
-    contracts:
-      - name: ERC721 #A reference to the wildcard contract definition
+      - name: ERC721
         handler: ./src/EventHandlers.ts
         events:
-        - event: Transfer(address indexed from, address indexed to, uint256 value) 
-  - id: 7777777 # Zora
-    start_block: 0
-    contracts:
-      - name: ERC721 #A reference to the wildcard contract definition
-        handler: ./src/EventHandlers.ts
-        events: 
-        - event: Transfer(address indexed from, address indexed to, uint256 value)
+          - event: Transfer(address indexed from, address indexed to, uint256 tokenId)
+            field_selection:
+              transaction_fields:
+                - hash
 # Unordered multichain mode allows you to index events from multiple chains
 # in realtime but doesn't guarentee ordering between chains
 # https://docs.envio.dev/docs/HyperIndex/multichain-indexing#unordered-multichain-mode
