@@ -4,10 +4,10 @@ import { createPublicClient, http } from "viem";
 import { mainnet } from "viem/chains";
 
 // Use environment variable with fallback
-const rpcUrl = process.env.RPC_URL_1 || process.env.RPC_URL;
+const rpcUrl = process.env.RPC_URL;
 
 if (!rpcUrl) {
-  throw new Error("RPC_URL_1 or RPC_URL environment variable is required");
+  throw new Error("RPC_URL environment variable is required");
 }
 
 const client = createPublicClient({
@@ -38,7 +38,7 @@ export const getTokenURI = experimental_createEffect(
       if (isTestContract) {
         context.log.info(`🎯 [TEST CONTRACT] Fetching tokenURI for ${contractAddress} token ${tokenId}`);
       } else {
-        context.log.debug(`Fetching tokenURI for ${contractAddress} token ${tokenId}`);
+        //context.log.debug(`Fetching tokenURI for ${contractAddress} token ${tokenId}`);
       }
       
       const tokenURI = await client.readContract({
@@ -61,7 +61,7 @@ export const getTokenURI = experimental_createEffect(
       if (isTestContract) {
         context.log.info(`🎯 [TEST CONTRACT] SUCCESS - tokenURI: ${result}`);
       } else {
-        context.log.debug(`Successfully got tokenURI: ${result.substring(0, 50)}...`);
+        //context.log.debug(`Successfully got tokenURI: ${result.substring(0, 50)}...`);
       }
       return result;
       
@@ -69,7 +69,7 @@ export const getTokenURI = experimental_createEffect(
       if (isTestContract) {
         context.log.error(`🎯 [TEST CONTRACT] FAILED for ${contractAddress} token ${tokenId}: ${error}`);
       } else {
-        context.log.warn(`Failed to get tokenURI for ${contractAddress} token ${tokenId}: ${error}`);
+        //context.log.warn(`Failed to get tokenURI for ${contractAddress} token ${tokenId}: ${error}`);
       }
       return "";
     }

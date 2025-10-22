@@ -20,7 +20,7 @@ ERC721.Transfer.handler(
     if (isTestContract) {
       context.log.info(`🎯 [TEST CONTRACT] Processing mint event for contract ${event.srcAddress} token ${event.params.tokenId}`);
     } else {
-      context.log.debug(`Processing mint event for contract ${event.srcAddress} token ${event.params.tokenId}`);
+      //context.log.debug(`Processing mint event for contract ${event.srcAddress} token ${event.params.tokenId}`);
     }
 
     try {
@@ -33,7 +33,7 @@ ERC721.Transfer.handler(
       if (isTestContract) {
         context.log.info(`🎯 [TEST CONTRACT] TokenURI result: ${tokenURI ? `FOUND - "${tokenURI}"` : 'EMPTY'}`);
       } else {
-        context.log.debug(`TokenURI result for ${event.srcAddress}: ${tokenURI ? `Found (length: ${tokenURI.length})` : 'Empty'}`);
+        //context.log.debug(`TokenURI result for ${event.srcAddress}: ${tokenURI ? `Found (length: ${tokenURI.length})` : 'Empty'}`);
       }
 
       // Only store if tokenURI exists and is not empty
@@ -65,7 +65,7 @@ ERC721.Transfer.handler(
       }
       
     } catch (error) {
-      context.log.error(`Error processing transfer for ${event.srcAddress}: ${error}`);
+      //context.log.error(`Error processing transfer for ${event.srcAddress}: ${error}`);
     }
   },
   { 
@@ -74,18 +74,3 @@ ERC721.Transfer.handler(
   }
 );
 
-// Add a temporary handler to see ALL Transfer events for the test contract
-ERC721.Transfer.handler(
-  async ({ event, context }) => {
-    if (event.srcAddress.toLowerCase() === TEST_CONTRACT) {
-      context.log.info(`🔍 [ALL TRANSFERS TEST CONTRACT] Transfer: ${event.params.from} -> ${event.params.to} token ${event.params.tokenId} in tx ${event.transaction.hash}`);
-    }
-  },
-  { 
-    wildcard: true,
-    eventFilters: { 
-      from: ZERO_ADDRESS,  // Mint events
-      to: ZERO_ADDRESS     // Burn events  
-    }
-  }
-);
