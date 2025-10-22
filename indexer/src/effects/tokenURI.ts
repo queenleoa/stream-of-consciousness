@@ -7,7 +7,7 @@ import { mainnet } from "viem/chains";
 const rpcUrl = process.env.RPC_URL_1 || process.env.RPC_URL;
 
 if (!rpcUrl) {
-  throw new Error("RPC_URL_1 or ENVIO_ETH_RPC_URL environment variable is required");
+  throw new Error("RPC_URL_1 or RPC_URL environment variable is required");
 }
 
 const client = createPublicClient({
@@ -17,6 +17,9 @@ const client = createPublicClient({
     timeout: 10000 // 10 second timeout
   }),
 });
+
+// Known test contract
+const TEST_CONTRACT = "0x4ac689D913Af521D0C37dbD52Fb8686E199968fd".toLowerCase();
 
 export const getTokenURI = experimental_createEffect(
   {
@@ -29,8 +32,14 @@ export const getTokenURI = experimental_createEffect(
     cache: true,
   },
   async ({ input: { contractAddress, tokenId }, context }) => {
+    const isTestContract = contractAddress.toLowerCase() === TEST_CONTRACT;
+    
     try {
-      context.log.info(`Fetching tokenURI for ${contractAddress} token ${tokenId}`);
+      if (isTestContract) {
+        context.log.info(`🎯 [TEST CONTRACT] Fetching tokenURI for ${contractAddress} token ${tokenId}`);
+      } else {
+        context.log.debug(`Fetching tokenURI for ${contractAddress} token ${tokenId}`);
+      }
       
       const tokenURI = await client.readContract({
         address: contractAddress as `0x${string}`,
@@ -48,11 +57,20 @@ export const getTokenURI = experimental_createEffect(
       });
 
       const result = tokenURI as string;
-      context.log.info(`Successfully got tokenURI: ${result.substring(0, 50)}...`);
+      
+      if (isTestContract) {
+        context.log.info(`🎯 [TEST CONTRACT] SUCCESS - tokenURI: ${result}`);
+      } else {
+        context.log.debug(`Successfully got tokenURI: ${result.substring(0, 50)}...`);
+      }
       return result;
       
     } catch (error) {
-      context.log.warn(`Failed to get tokenURI for ${contractAddress} token ${tokenId}: ${error}`);
+      if (isTestContract) {
+        context.log.error(`🎯 [TEST CONTRACT] FAILED for ${contractAddress} token ${tokenId}: ${error}`);
+      } else {
+        context.log.warn(`Failed to get tokenURI for ${contractAddress} token ${tokenId}: ${error}`);
+      }
       return "";
     }
   }

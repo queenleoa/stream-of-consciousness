@@ -3,16 +3,25 @@ import { ERC721 } from "generated";
 import { getTokenURI } from "./effects/tokenURI";
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+const TEST_CONTRACT = "0x4ac689D913Af521D0C37dbD52Fb8686E199968fd".toLowerCase();
 
 ERC721.Transfer.handler(
   async ({ event, context }) => {
+    const isTestContract = event.srcAddress.toLowerCase() === TEST_CONTRACT;
+    
     // Only process mint events
     if (event.params.from !== ZERO_ADDRESS) {
-      context.log.debug(`Skipping non-mint transfer from ${event.params.from} to ${event.params.to}`);
+      if (isTestContract) {
+        context.log.info(`🎯 [TEST CONTRACT] Skipping non-mint transfer from ${event.params.from} to ${event.params.to}`);
+      }
       return;
     }
 
-    context.log.info(`Processing mint event for contract ${event.srcAddress} token ${event.params.tokenId}`);
+    if (isTestContract) {
+      context.log.info(`🎯 [TEST CONTRACT] Processing mint event for contract ${event.srcAddress} token ${event.params.tokenId}`);
+    } else {
+      context.log.debug(`Processing mint event for contract ${event.srcAddress} token ${event.params.tokenId}`);
+    }
 
     try {
       // Get tokenURI using Effect API
@@ -21,11 +30,17 @@ ERC721.Transfer.handler(
         tokenId: event.params.tokenId,
       });
 
-      context.log.info(`TokenURI result for ${event.srcAddress}: ${tokenURI ? `Found (length: ${tokenURI.length})` : 'Empty'}`);
+      if (isTestContract) {
+        context.log.info(`🎯 [TEST CONTRACT] TokenURI result: ${tokenURI ? `FOUND - "${tokenURI}"` : 'EMPTY'}`);
+      } else {
+        context.log.debug(`TokenURI result for ${event.srcAddress}: ${tokenURI ? `Found (length: ${tokenURI.length})` : 'Empty'}`);
+      }
 
       // Only store if tokenURI exists and is not empty
       if (tokenURI && tokenURI.length > 0) {
-        context.log.info(`Storing transfer for ${event.srcAddress} token ${event.params.tokenId}`);
+        if (isTestContract) {
+          context.log.info(`🎯 [TEST CONTRACT] STORING transfer for ${event.srcAddress} token ${event.params.tokenId}`);
+        }
         
         context.Transfer.set({
           id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
@@ -40,9 +55,13 @@ ERC721.Transfer.handler(
           tokenURI: tokenURI,
         });
         
-        context.log.info(`Successfully stored transfer for ${event.srcAddress}`);
+        if (isTestContract) {
+          context.log.info(`🎯 [TEST CONTRACT] SUCCESSFULLY stored transfer!`);
+        }
       } else {
-        context.log.info(`Skipping ${event.srcAddress} - no tokenURI found`);
+        if (isTestContract) {
+          context.log.info(`🎯 [TEST CONTRACT] SKIPPING - no tokenURI found`);
+        }
       }
       
     } catch (error) {
@@ -52,5 +71,21 @@ ERC721.Transfer.handler(
   { 
     wildcard: true, 
     eventFilters: { from: ZERO_ADDRESS } 
+  }
+);
+
+// Add a temporary handler to see ALL Transfer events for the test contract
+ERC721.Transfer.handler(
+  async ({ event, context }) => {
+    if (event.srcAddress.toLowerCase() === TEST_CONTRACT) {
+      context.log.info(`🔍 [ALL TRANSFERS TEST CONTRACT] Transfer: ${event.params.from} -> ${event.params.to} token ${event.params.tokenId} in tx ${event.transaction.hash}`);
+    }
+  },
+  { 
+    wildcard: true,
+    eventFilters: { 
+      from: ZERO_ADDRESS,  // Mint events
+      to: ZERO_ADDRESS     // Burn events  
+    }
   }
 );
