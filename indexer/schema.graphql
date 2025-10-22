@@ -1,13 +1,5 @@
-type Contract {
-  id: ID!                 # "<chainId>_<address>"
-  chainId: Int!
-  address: String!
-  isErc721: Boolean!
-  checkedAtBlock: BigInt
-}
-
 type Transfer {
-  id: ID!                 # "<chainId>_<blockNumber>_<logIndex>"
+  id: ID!
   chainId: Int!
   blockNumber: BigInt!
   logIndex: Int!
@@ -16,4 +8,5 @@ type Transfer {
   tokenId: BigInt!
   from: String!
   to: String!
+  tokenURI: String!
 }

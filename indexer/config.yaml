@@ -1,9 +1,10 @@
 # yaml-language-server: $schema=./node_modules/envio/evm.schema.json
 name: erc721indexer
 description: ERC-721 indexer
+
 networks:
   - id: 1
-    start_block: 13626540
+    start_block: 22492804
     contracts:
       - name: ERC721
         handler: ./src/EventHandlers.ts
@@ -19,7 +20,7 @@ unordered_multichain_mode: true
 # Preload optimisation makes your indexer much faster.
 # But be aware that your handlers will run twice,
 # so make sure to use Effect API for external calls.
-preload_handlers: false
+preload_handlers: true
 # Address format for Ethereum addresses: 'checksum' or 'lowercase'
 # using lowercase addresses is slightly faster
 address_format: lowercase
