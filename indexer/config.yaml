@@ -3,7 +3,7 @@ name: erc721indexer
 description: ERC-721 indexer
 networks:
   - id: 1
-    start_block: 0
+    start_block: 13626540
     contracts:
       - name: ERC721
         handler: ./src/EventHandlers.ts
@@ -19,7 +19,7 @@ unordered_multichain_mode: true
 # Preload optimisation makes your indexer much faster.
 # But be aware that your handlers will run twice,
 # so make sure to use Effect API for external calls.
-preload_handlers: true
+preload_handlers: false
 # Address format for Ethereum addresses: 'checksum' or 'lowercase'
 # using lowercase addresses is slightly faster
 address_format: lowercase
