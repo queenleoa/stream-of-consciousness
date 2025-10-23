@@ -9,4 +9,11 @@ type Transfer {
   from: String!
   to: String!
   tokenURI: String!
+  # Metadata fields
+  name: String
+  description: String
+  image_url: String
+  animation_url: String
+  external_url: String
+  attributes: String  # JSON string of traits array
 }
