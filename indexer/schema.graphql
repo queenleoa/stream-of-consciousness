@@ -14,7 +14,7 @@ type Art {
   
   # Metadata (populated by backfill service)
   tokenURI: String
-  name: String 
+  name: String @index
   image_url: String @index
   animation_url: String
   external_url: String

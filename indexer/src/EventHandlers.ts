@@ -7,13 +7,9 @@ const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const MAX_TOKEN_ID = 10001n; // Only index tokens up to 10,001
 
 ERC721.Transfer.handler(
-  async ({ event, context }) => {
-    // Only process mint events
-    if (event.params.from !== ZERO_ADDRESS) {
-      return;
-    }
+  async ({ event, context }) => {    
 
-    // FILTER 1: TokenID range check (NO RPC CALL)
+    // FILTER: TokenID range check (NO RPC CALL)
     if (event.params.tokenId > MAX_TOKEN_ID) {
       context.log.debug(`Skipping high tokenId: ${event.params.tokenId}`);
       return;
@@ -49,10 +45,10 @@ ERC721.Transfer.handler(
         blockNumber: BigInt(event.block.number),
         txHash: event.transaction.hash,
         tokenURI: tokenURI,
-        name: undefined,
-        image_url: undefined,
-        animation_url: undefined,
-        external_url: undefined,
+        name: metadata.name,
+        image_url: metadata.image_url,
+        animation_url: metadata.animation_url,
+        external_url: metadata.external_url,
         creatorContextURI: undefined,
         awakeningURI: undefined,
         journeysURI: undefined,
@@ -61,11 +57,13 @@ ERC721.Transfer.handler(
       context.log.info(`✅ Art indexed: ${event.srcAddress} #${event.params.tokenId}`);
 
     } catch (error) {
-      context.log.error(`Error processing ${event.srcAddress}: ${error}`);
+      context.log.error(`Could not process ${event.srcAddress}: ${error}`);
     }
   },
   {
     wildcard: true,
     eventFilters: { from: ZERO_ADDRESS }
+    // Only process mint events
   }
 );
+
