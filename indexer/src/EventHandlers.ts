@@ -2,7 +2,6 @@
 import { ERC721 } from "generated";
 import { getTokenURI } from "./effects/tokenURI";
 import { fetchNFTMetadata } from "./effects/metadata";
-import { isERC721Contract } from "./effects/contractValidation";
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const MAX_TOKEN_ID = 10001n; // Only index tokens up to 10,001
@@ -21,16 +20,6 @@ ERC721.Transfer.handler(
     }
 
     try {
-      // FILTER 2: ERC721 Validation (only for contracts that pass tokenId filter)
-      const isERC721 = await context.effect(isERC721Contract, {
-        contractAddress: event.srcAddress,
-        tokenId: event.params.tokenId, // Pass tokenId for context
-      });
-
-      if (!isERC721) {
-        context.log.debug(`Skipping non-ERC721: ${event.srcAddress}`);
-        return;
-      }
 
       // Get tokenURI for validated ERC721 contracts only
       const tokenURI = await context.effect(getTokenURI, {

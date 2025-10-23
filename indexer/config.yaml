@@ -5,9 +5,10 @@ description: ERC-721 indexer
 networks:
   - id: 1
     start_block: 113641174
+    end_block: 113741174
     contracts:
       - name: ERC721
-        #handler: #./src/EventHandlers.ts
+        handler: ./src/EventHandlers.ts
         events:
           - event: Transfer(address indexed from, address indexed to, uint256 indexed tokenId)
             field_selection:
