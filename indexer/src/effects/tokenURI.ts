@@ -2,6 +2,7 @@
 import { experimental_createEffect, S } from "envio";
 import { createPublicClient, fallback, http } from "viem";
 import { mainnet } from "viem/chains";
+import { sanitizeTokenURI } from "./sanitize";
 
 const rpcUrls = [
   process.env.ENVIO_RPC_URL_0,
@@ -9,6 +10,8 @@ const rpcUrls = [
   process.env.ENVIO_RPC_URL_2,
   process.env.ENVIO_RPC_URL_3,
   process.env.ENVIO_RPC_URL_4,
+  process.env.ENVIO_RPC_URL_5,
+  process.env.ENVIO_RPC_URL_6,
 ].filter(Boolean);
 
 const client = createPublicClient({
@@ -34,6 +37,7 @@ const waitForTokenURIRateLimit = async () => {
   }
   lastTokenURICallTime = Date.now();
 };
+
 
 export const getTokenURI = experimental_createEffect(
   {
@@ -68,7 +72,18 @@ export const getTokenURI = experimental_createEffect(
       });
 
       const result = tokenURI as string;
-      return result;
+
+      // More aggressive sanitization for early blocks
+      let sanitizedResult = sanitizeTokenURI(result);
+      
+      // If still problematic, return empty
+      if (containsNullBytes(sanitizedResult)) {
+        context.log.warn(`Null bytes detected after sanitization for ${contractAddress}, skipping`);
+        return "";
+      }
+
+      return sanitizedResult;
+
 
     } catch (error) {
       context.log.warn(`tokenURI failed for ${contractAddress}: ${error}`);
@@ -76,3 +91,8 @@ export const getTokenURI = experimental_createEffect(
     }
   }
 );
+
+// Additional helper
+function containsNullBytes(str: string): boolean {
+  return str.includes('\0') || str.includes('\x00');
+}
