@@ -1,21 +1,34 @@
 // src/effects/metadata.ts
 import { experimental_createEffect, S } from "envio";
 
-// Remove this line: import fetch from 'node-fetch';
-
-// Define the metadata schema with all fields as optional
+// Define the metadata schema matching your new Art schema
 const nftMetadataSchema = S.schema({
     name: S.optional(S.string),
-    description: S.optional(S.string),
     image_url: S.optional(S.string),
     animation_url: S.optional(S.string),
     external_url: S.optional(S.string),
-    attributes: S.optional(S.string), // Store as JSON string instead of complex object
+    // Note: removed description and attributes to match your schema
 });
 
 export type NFTMetadata = S.Infer<typeof nftMetadataSchema>;
 
-// Helper function for timeout
+// Rate limiting for IPFS/Arweave calls
+let lastMetadataFetchTime = 0;
+const MIN_METADATA_INTERVAL_MS = 500; // 500ms between metadata fetches
+
+const waitForMetadataRateLimit = async () => {
+    const now = Date.now();
+    const timeSinceLastFetch = now - lastMetadataFetchTime;
+    
+    if (timeSinceLastFetch < MIN_METADATA_INTERVAL_MS) {
+        await new Promise(resolve => 
+            setTimeout(resolve, MIN_METADATA_INTERVAL_MS - timeSinceLastFetch)
+        );
+    }
+    lastMetadataFetchTime = Date.now();
+};
+
+// Helper function for timeout (your existing code)
 const fetchWithTimeout = async (url: string, timeoutMs: number = 10000): Promise<Response> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -38,22 +51,27 @@ const fetchWithTimeout = async (url: string, timeoutMs: number = 10000): Promise
 export const fetchNFTMetadata = experimental_createEffect(
     {
         name: "fetchNFTMetadata",
-        input: S.string, // tokenURI
+        input: S.schema({
+            tokenURI: S.string,
+            contractAddress: S.string,
+            tokenId: S.bigint,
+        }),
         output: nftMetadataSchema,
-        cache: false, // Cache metadata results
+        cache: true, // Enable caching to avoid duplicate metadata fetches
     },
-    async ({ input: tokenURI, context }): Promise<NFTMetadata> => {
+    async ({ input: { tokenURI, contractAddress, tokenId }, context }): Promise<NFTMetadata> => {
         const emptyResult: NFTMetadata = {
             name: undefined,
-            description: undefined,
             image_url: undefined,
             animation_url: undefined,
             external_url: undefined,
-            attributes: undefined,
         };
 
+        // Apply rate limiting for IPFS/Arweave calls
+        await waitForMetadataRateLimit();
+
         try {
-            // Handle different URI schemes
+            // Handle different URI schemes (your existing code)
             let fetchUrl = tokenURI;
 
             // Convert IPFS to HTTP if needed
@@ -89,15 +107,13 @@ export const fetchNFTMetadata = experimental_createEffect(
 
                     return {
                         name: typeof metadata.name === 'string' ? metadata.name : undefined,
-                        description: typeof metadata.description === 'string' ? metadata.description : undefined,
                         image_url: typeof metadata.image === 'string' ? metadata.image :
                             typeof metadata.image_url === 'string' ? metadata.image_url : undefined,
                         animation_url: typeof metadata.animation_url === 'string' ? metadata.animation_url : undefined,
                         external_url: typeof metadata.external_url === 'string' ? metadata.external_url : undefined,
-                        attributes: metadata.attributes ? JSON.stringify(metadata.attributes) : undefined,
                     };
                 } catch (error) {
-                    context.log.warn(`Failed to parse data URI: ${error}`);
+                    context.log.warn(`Failed to parse data URI for ${contractAddress}: ${error}`);
                     return emptyResult;
                 }
             }
@@ -115,18 +131,15 @@ export const fetchNFTMetadata = experimental_createEffect(
             return {
                 name: typeof metadata.name === 'string' ? metadata.name :
                     typeof metadata.title === 'string' ? metadata.title : undefined,
-                description: typeof metadata.description === 'string' ? metadata.description : undefined,
                 image_url: typeof metadata.image === 'string' ? metadata.image :
                     typeof metadata.image_url === 'string' ? metadata.image_url : undefined,
                 animation_url: typeof metadata.animation_url === 'string' ? metadata.animation_url : undefined,
                 external_url: typeof metadata.external_url === 'string' ? metadata.external_url :
                     typeof metadata.external_link === 'string' ? metadata.external_link : undefined,
-                attributes: metadata.attributes ? JSON.stringify(metadata.attributes) :
-                    metadata.traits ? JSON.stringify(metadata.traits) : undefined,
             };
 
         } catch (error) {
-            context.log.warn(`Failed to fetch metadata from ${tokenURI.substring(0, 100)}: ${error}`);
+            context.log.warn(`Failed to fetch metadata for ${contractAddress} token ${tokenId}: ${error}`);
             return emptyResult;
         }
     }

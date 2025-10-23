@@ -1,25 +1,39 @@
 // src/effects/tokenURI.ts
 import { experimental_createEffect, S } from "envio";
-import { createPublicClient, http } from "viem";
+import { createPublicClient, fallback, http } from "viem";
 import { mainnet } from "viem/chains";
 
-// Use environment variable with fallback
-const rpcUrl = process.env.RPC_URL;
-
-if (!rpcUrl) {
-  throw new Error("RPC_URL environment variable is required");
-}
+const rpcUrls = [
+  process.env.ENVIO_RPC_URL_0,
+  process.env.ENVIO_RPC_URL_1,
+  process.env.ENVIO_RPC_URL_2,
+  process.env.ENVIO_RPC_URL_3,
+  process.env.ENVIO_RPC_URL_4,
+].filter(Boolean);
 
 const client = createPublicClient({
   chain: mainnet,
-  transport: http(rpcUrl, { 
-    batch: true,
-    timeout: 10000 // 10 second timeout
-  }),
+  transport: fallback(rpcUrls.map(url => http(url, {
+    batch: { wait: 50 }, // Smaller batch window
+    timeout: 10000,
+  })))
 });
 
-// Known test contract
-const TEST_CONTRACT = "0x4ac689D913Af521D0C37dbD52Fb8686E199968fd".toLowerCase();
+/// Share the same rate limiting with contract validation
+let lastTokenURICallTime = 0;
+const MIN_TOKENURI_INTERVAL_MS = 100; // 100ms between tokenURI calls
+
+const waitForTokenURIRateLimit = async () => {
+  const now = Date.now();
+  const timeSinceLastCall = now - lastTokenURICallTime;
+
+  if (timeSinceLastCall < MIN_TOKENURI_INTERVAL_MS) {
+    await new Promise(resolve =>
+      setTimeout(resolve, MIN_TOKENURI_INTERVAL_MS - timeSinceLastCall)
+    );
+  }
+  lastTokenURICallTime = Date.now();
+};
 
 export const getTokenURI = experimental_createEffect(
   {
@@ -27,20 +41,17 @@ export const getTokenURI = experimental_createEffect(
     input: S.schema({
       contractAddress: S.string,
       tokenId: S.bigint,
+      chainId: S.number,
     }),
     output: S.string,
     cache: true,
   },
-  async ({ input: { contractAddress, tokenId }, context }) => {
-    const isTestContract = contractAddress.toLowerCase() === TEST_CONTRACT;
-    
+  async ({ input: { contractAddress, tokenId, chainId }, context }) => {
     try {
-      if (isTestContract) {
-        context.log.info(`🎯 [TEST CONTRACT] Fetching tokenURI for ${contractAddress} token ${tokenId}`);
-      } else {
-        //context.log.debug(`Fetching tokenURI for ${contractAddress} token ${tokenId}`);
-      }
-      
+      await waitForTokenURIRateLimit();
+
+      context.log.debug(`Fetching tokenURI for ${contractAddress} token ${tokenId}`);
+
       const tokenURI = await client.readContract({
         address: contractAddress as `0x${string}`,
         abi: [
@@ -57,20 +68,10 @@ export const getTokenURI = experimental_createEffect(
       });
 
       const result = tokenURI as string;
-      
-      if (isTestContract) {
-        context.log.info(`🎯 [TEST CONTRACT] SUCCESS - tokenURI: ${result}`);
-      } else {
-        //context.log.debug(`Successfully got tokenURI: ${result.substring(0, 50)}...`);
-      }
       return result;
-      
+
     } catch (error) {
-      if (isTestContract) {
-        context.log.error(`🎯 [TEST CONTRACT] FAILED for ${contractAddress} token ${tokenId}: ${error}`);
-      } else {
-        //context.log.warn(`Failed to get tokenURI for ${contractAddress} token ${tokenId}: ${error}`);
-      }
+      context.log.warn(`tokenURI failed for ${contractAddress}: ${error}`);
       return "";
     }
   }

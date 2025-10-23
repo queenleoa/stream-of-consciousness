@@ -1,19 +1,26 @@
-type Transfer {
-  id: ID!
-  chainId: Int!
-  blockNumber: BigInt!
-  logIndex: Int!
-  txHash: String!
-  contract: String!
-  tokenId: BigInt!
-  from: String!
-  to: String!
-  tokenURI: String!
-  # Metadata fields
-  name: String
-  description: String
-  image_url: String
+# schema.graphql
+type Art {
+  id: ID! #chainId_contract_tokenId
+  
+  # On-chain identity (all indexed for querying)
+  chainId: Int! @index
+  contract: String! @index
+  tokenId: BigInt! @index
+  
+  # Minting info
+  minter: String! @index
+  blockNumber: BigInt! @index
+  txHash: String! @index
+  
+  # Metadata (populated by backfill service)
+  tokenURI: String
+  name: String 
+  image_url: String @index
   animation_url: String
   external_url: String
-  attributes: String  # JSON string of traits array
+  
+  # Off-chain curation (stored on Arweave)
+  creatorContextURI: String  # Creator-provided context
+  awakeningURI: String       # AI curation
+  journeysURI: String        # Logged in wallets that visited the art
 }
