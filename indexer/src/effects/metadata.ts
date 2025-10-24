@@ -12,6 +12,7 @@ const nftMetadataSchema = S.schema({
 
 export type NFTMetadata = S.Infer<typeof nftMetadataSchema>;
 
+
 // Rate limiting for IPFS/Arweave calls
 let lastMetadataFetchTime = 0;
 const MIN_METADATA_INTERVAL_MS = 500; // 500ms between metadata fetches

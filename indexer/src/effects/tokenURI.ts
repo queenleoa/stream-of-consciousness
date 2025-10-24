@@ -11,7 +11,6 @@ const rpcUrls = [
   process.env.ENVIO_RPC_URL_3,
   process.env.ENVIO_RPC_URL_4,
   process.env.ENVIO_RPC_URL_5,
-  process.env.ENVIO_RPC_URL_6,
 ].filter(Boolean);
 
 const client = createPublicClient({

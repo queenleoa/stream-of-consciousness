@@ -4,7 +4,8 @@ description: ERC-721 indexer
 
 networks:
   - id: 1
-    start_block: 0
+    start_block: 22492800
+    end_block: 22492810
     contracts:
       - name: ERC721
         handler: ./src/EventHandlers.ts
@@ -13,6 +14,18 @@ networks:
             field_selection:
               transaction_fields:
                 - hash
+
+  - id: 11155111  # Sepolia
+    start_block: 0
+    contracts:
+      - name: ArtMetadataUpdater
+        address: 
+        - 0xFAA5869c1d027E48a2618440a06E90656F16Bb3F
+        handler: src/EventHandlers.ts
+        events:
+          - event: CreatorContextUpdated(string artId, string creatorContextURI, address updatedBy)
+          - event: AwakeningURIUpdated(string artId, string awakeningURI, address updatedBy)  
+          - event: JourneysURIUpdated(string artId, string journeysURI, address updatedBy)              
 # Unordered multichain mode allows you to index events from multiple chains
 # in realtime but doesn't guarentee ordering between chains
 # https://docs.envio.dev/docs/HyperIndex/multichain-indexing#unordered-multichain-mode

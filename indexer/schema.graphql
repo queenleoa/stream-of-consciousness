@@ -15,7 +15,7 @@ type Art {
   # Metadata (populated by backfill service)
   tokenURI: String
   name: String @index
-  image_url: String @index
+  image_url: String 
   animation_url: String
   external_url: String
   
@@ -23,4 +23,9 @@ type Art {
   creatorContextURI: String  # Creator-provided context
   awakeningURI: String       # AI curation
   journeysURI: String        # Logged in wallets that visited the art
+}
+
+type GlobalState {
+  id: ID! # "global-state"
+  count: Int!
 }
