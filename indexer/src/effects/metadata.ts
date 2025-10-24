@@ -60,7 +60,7 @@ export const fetchNFTMetadata = experimental_createEffect(
             tokenId: S.bigint,
         }),
         output: nftMetadataSchema,
-        cache: true, // Enable caching to avoid duplicate metadata fetches
+        cache: false, // Enable caching to avoid duplicate metadata fetches
     },
     async ({ input: { tokenURI, contractAddress, tokenId }, context }): Promise<NFTMetadata> => {
         const emptyResult: NFTMetadata = {
