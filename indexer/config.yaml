@@ -4,8 +4,7 @@ description: ERC-721 indexer
 
 networks:
   - id: 1
-    start_block: 22492800
-    end_block: 22492810
+    start_block: 0
     contracts:
       - name: ERC721
         handler: ./src/EventHandlers.ts
