@@ -3,18 +3,18 @@ type Art {
   id: ID! #chainId_contract_tokenId
   
   # On-chain identity (all indexed for querying)
-  chainId: Int! @index
+  chainId: Int!
   contract: String! @index
-  tokenId: BigInt! @index
+  tokenId: BigInt! 
   
   # Minting info
-  minter: String! @index
-  blockNumber: BigInt! @index
-  txHash: String! @index
+  minter: String! 
+  blockNumber: BigInt! 
+  txHash: String! 
   
   # Metadata (populated by backfill service)
   tokenURI: String
-  name: String @index
+  name: String
   image_url: String 
   animation_url: String
   external_url: String
