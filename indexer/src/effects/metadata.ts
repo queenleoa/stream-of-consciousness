@@ -12,6 +12,8 @@ const nftMetadataSchema = S.schema({
 
 export type NFTMetadata = S.Infer<typeof nftMetadataSchema>;
 
+// Maximum size for metadata (adjust as needed)
+const MAX_METADATA_SIZE = 2000; // characters
 
 // Rate limiting for IPFS/Arweave calls
 let lastMetadataFetchTime = 0;
@@ -127,6 +129,8 @@ export const fetchNFTMetadata = experimental_createEffect(
             }
 
             const metadata = await response.json() as Record<string, unknown>;
+
+            
 
             // Extract fields with fallbacks for different metadata standards
             return {

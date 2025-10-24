@@ -45,7 +45,14 @@ ERC721.Transfer.handler(
         contractAddress: event.srcAddress,
         tokenId: event.params.tokenId,
       });
+
+      // QUICK FIX: Truncate name if it's too long
+      const MAX_NAME_LENGTH = 1800; // Safe limit for database
+      let safeName = metadata.name;
       
+      if (safeName && safeName.length > MAX_NAME_LENGTH) {
+        return;
+      }
 
       // Create Art entity
       context.Art.set({
