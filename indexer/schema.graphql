@@ -18,14 +18,29 @@ type Art {
   image_url: String 
   animation_url: String
   external_url: String
-  
-  # Off-chain curation (stored on Arweave)
-  creatorContextURI: String  # Creator-provided context
-  awakeningURI: String       # AI curation
-  journeysURI: String        # Logged in wallets that visited the art
 }
 
 type GlobalState {
   id: ID! # "global-state"
   count: Int!
 }
+
+# Separate entities for each URI type
+type ArtCreatorContext {
+  id: ID! # artId
+  creatorContextURI: String!
+  updatedBy: String! 
+}
+
+type Awakening {
+  id: ID! # artId
+  awakeningURI: String!
+  updatedBy: String! 
+}
+
+type Journeys {
+  id: ID! # artId
+  journeysURI: String!
+  updatedBy: String! 
+}
+

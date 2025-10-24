@@ -61,9 +61,6 @@ ERC721.Transfer.handler(
         image_url: metadata.image_url,
         animation_url: metadata.animation_url,
         external_url: metadata.external_url,
-        creatorContextURI: undefined,
-        awakeningURI: undefined,
-        journeysURI: undefined,
       });
 
       const incrementedTokenId = globalState.count + 1;
@@ -86,50 +83,39 @@ ERC721.Transfer.handler(
   }
 );
 
-
 // code section to bypass off chain data update restrictions 
-
-ArtMetadataUpdater.CreatorContextUpdated.handler(async ({ event, context }) => {
-  const { artId, creatorContextURI } = event.params;
+ArtMetadataUpdater.AwakeningURIUpdated.handler(async ({ event, context }) => {
+  const { artId, awakeningURI, updatedBy } = event.params;
   
+  context.Awakening.set({
+    id: artId, // Same ID as the Art entity
+    awakeningURI: awakeningURI,
+    updatedBy: updatedBy,
+  });
+  
+  context.log.info(`✅ Updated ArtAwakening for ${artId}`);
 });
 
-ArtMetadataUpdater.AwakeningURIUpdated.handler(async ({ event, context }) => {
-        context.log.debug(`checkpoint1`);
-
-    const artId = event.params.artId;
-    const awakeningURI = event.params.awakeningURI;
-
-    // Create Art entity
-      context.Art.set({
-        id: '123',
-        chainId: 1,
-        contract: '111',
-        tokenId: BigInt(1),
-        minter: artId,
-        blockNumber: BigInt(1),
-        txHash: '123',
-        tokenURI: '12',
-        name: undefined,
-        image_url: undefined,
-        animation_url: undefined,
-        external_url: undefined,
-        creatorContextURI: undefined,
-        awakeningURI: awakeningURI,
-        journeysURI: undefined,
-      });
-
-      context.log.debug(`checkpoint2 ${artId} and uri ${awakeningURI}`);
+ArtMetadataUpdater.CreatorContextUpdated.handler(async ({ event, context }) => {
+  const { artId, creatorContextURI, updatedBy } = event.params;
+  
+  context.ArtCreatorContext.set({
+    id: artId, // Same ID as the Art entity
+    creatorContextURI: creatorContextURI,
+    updatedBy: updatedBy,
+  });
+  
+  context.log.info(`✅ Updated ArtAwakening for ${artId}`);
 });
 
 ArtMetadataUpdater.JourneysURIUpdated.handler(async ({ event, context }) => {
-  const { artId, journeysURI } = event.params;
+  const { artId, journeysURI, updatedBy } = event.params;
   
+  context.Journeys.set({
+    id: artId, // Same ID as the Art entity
+    journeysURI: journeysURI,
+    updatedBy: updatedBy,
+  });
+  
+  context.log.info(`✅ Updated ArtAwakening for ${artId}`);
 });
-
-
-
-
-
-
-

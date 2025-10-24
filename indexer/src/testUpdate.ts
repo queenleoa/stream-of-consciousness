@@ -25,7 +25,7 @@ async function testUpdate() {
 
   // Test data
   const artId = "1_0x4ac689D913Af521D0C37dbD52Fb8686E199968fd_1";
-  const testURI = "https://awakening.com/test-metadata.json";
+  const testURI = "https://context.com/test-metadata.json";
 
   try {
     console.log(`📝 Testing update for Art: ${artId}`);
@@ -35,7 +35,7 @@ async function testUpdate() {
 
     // Test awakeningURI update
     console.log("1. Testing updateAwakeningURI...");
-    const tx = await contract.updateAwakeningURI(artId, testURI);
+    const tx = await contract.updateCreatorContextURI(artId, testURI);
     console.log(`   ✅ Transaction sent: ${tx.hash}`);
     
     console.log("   ⏳ Waiting for confirmation...");
