@@ -2,8 +2,12 @@ import { useRef, useState, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
+import { fetchArtByPkOnce, getImageUrl } from "../data/indexer"
 
-export default function ArtworkOrb({ imageUrl = '/test.png' }) { //replace with url
+const art = await fetchArtByPkOnce();        // full object (all fields)
+const img = await getImageUrl();             // just the image_url
+
+export default function ArtworkOrb({ imageUrl = img }) { //replace with url
   const groupRef = useRef();
   const [imageDimensions, setImageDimensions] = useState({ width: 512, height: 512 });
   
