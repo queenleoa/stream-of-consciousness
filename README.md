@@ -8,7 +8,7 @@
 🧱 Architecture Overview
 ------------------------
 
-*(Insert your `architecture.png` here once uploaded)*
+![alt text](https://github.com/queenleoa/stream-of-consciousness/blob/8c80df89f8af87001364ed29b6dcbc1a598e7d2b/architecture.png)
 
 **Stream of Consciousness** integrates four distinct but interlinked systems:
 
