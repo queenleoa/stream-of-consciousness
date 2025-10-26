@@ -122,7 +122,7 @@ export default function FloatingCard({
           <div style={{ 
             fontSize: '16px', 
             opacity: 0.9,
-            lineHeight: '1.5',
+            lineHeight: '1.85',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             display: '-webkit-box',

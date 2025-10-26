@@ -17,11 +17,11 @@ body, html, #root {
 }
 
 .fade-in {
-  animation: fadeIn 0.8s ease-in forwards;
+  animation: fadeIn 0.9s ease-in forwards;
 }
 
 .fade-out {
-  animation: fadeOut 0.8s ease-out forwards;
+  animation: fadeOut 0.9s ease-out forwards;
 }
 
 @keyframes fadeIn {
